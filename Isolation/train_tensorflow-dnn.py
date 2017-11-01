@@ -128,6 +128,6 @@ with tf.Session() as sess:
   sig_eff = float(ns_sel)/float(ns_total) 
   bkg_eff = float(nb_sel)/float(nb_total)
  
-  print "signal eff= ", sig_eff, " selected nbackground = ", bkg_eff
+  print "signal eff = ", sig_eff, " background eff = ", bkg_eff
 
 
