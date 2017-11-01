@@ -26,7 +26,7 @@ def read_txt(filename, shape=None, masscuts=None):
         nset, maxn = get_shape(data)
 
     leading = np.empty((nset, 4))
-    components = np.empty((nset, maxn, 4))
+    components = np.zeros((nset, maxn, 4))
     irow = 0
     iset = 0
     while irow <len(data):
