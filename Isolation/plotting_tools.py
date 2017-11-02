@@ -1,3 +1,10 @@
+USAGE_MESSAGE = """
+Usage:
+For generatating all plots (with different settings like log scale) and save them, call:
+$ python plotting_tools.py all path/to/input_filename.csv plot_title
+For displaying one plot (not saving), call:
+$ python plotting_tools.py path/to/input_filename.csv optional_plot_title
+"""
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
@@ -112,11 +119,32 @@ def generate_all_plots(data, xlabel, nbin=100):
             save=True, noshow=True)
 
 if __name__=="__main__":
-    filename="data/abs_iso_with_labels.csv"
-    data = np.loadtxt(filename)
+    import sys
 
-    # Make one plot with log scale on y-axis.
-    #plot_distribution(data, xlabel="Absolute Isolation", normed=False, xlog=False, ylog=True, nbin=100)
+    # Fast operations from commandline
+    if len(sys.argv)>1:
+        if sys.argv[1] == "all":
+            try:
+                filename=sys.argv[2]
+                xlabel = sys.argv[3]
+            except:
+                raise ValueError("Not enough arguments. See Usage below.\n{}".format(USAGE_MESSAGE))
+            data = np.loadtxt(filename)
+            generate_all_plots(data, xlabel)
+        else:
+            try:
+                filename=sys.argv[1]
+                xlabel = sys.argv[2]
+            except:
+                raise ValueError("Not enough arguments. See Usage below.\n{}".format(USAGE_MESSAGE))
+                print USAGE_MESSAGE
+            data = np.loadtxt(filename)
+            plot_distribution(data, xlabel=xlabel, normed=True, xlog=False, ylog=False, nbin=100)
+    else:
+        pass
+        # Make one plot with log scale on y-axis.
+        #plot_distribution(data, xlabel="Absolute Isolation", normed=False, xlog=False, ylog=True, nbin=100)
 
-    # Meta function that automatically generates 8 plots and saves them.
-    generate_all_plots(data, "Absolute Isolation")
+        # Meta function that automatically generates 8 plots and saves them.
+        #generate_all_plots(data, "Absolute Isolation")
+        #generate_all_plots(data, "Relative Isolation")
