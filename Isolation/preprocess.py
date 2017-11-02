@@ -46,7 +46,7 @@ def read_txt(filename, shape=None, masscuts=None):
         irow += ncomp
         iset += 1
 
-    mass = np.sqrt(leading[0::,3]**2-leading[0::,0]**2-leading[0::,1]**2-leading[0::,2]**2)
+    mass = np.sqrt(leading[:,3]**2-leading[:,0]**2-leading[:,1]**2-leading[:,2]**2)
     if masscuts:
         mask=np.bitwise_and(mass>=masscuts[0],mass<=masscuts[1])
         leading=leading[mask,:]
