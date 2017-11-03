@@ -50,7 +50,7 @@ def format_out_filename(xlabel, normed, xlog, ylog, nbin):
 def plot_distribution(data, xlabel="", title="Signal/Background Distribution", nbin=100, normed=False, xlog=False, ylog=False, save=False, noshow=False):
 
     if xlog:
-        # Accomodating for 0 values if x is in log scale
+        # If x is in log scale, accomodating for 0 values by adding 1
         data[:,0] += 1
 
     # Format of separated_data : [signal_data, background_data]
@@ -72,17 +72,15 @@ def plot_distribution(data, xlabel="", title="Signal/Background Distribution", n
     if xlog:
         plt.xscale("log")
         title += "(logged x)"
-        # Decreasing tick labels by a factor of 10
-        xlim = np.log10(ax.get_xlim())
-        xlim[0], xlim[1] = np.ceil(xlim[0]), np.floor(xlim[1])+1
-        tick_pos, real_val = 10**np.arange(*xlim), 10**np.arange(*(xlim-1))
-        # Change label "0.1" to "0"
-        for i in range(len(real_val)):
-            if real_val[i] == 0.1:
-                real_val[i] = 0
-                break
+        # Decreasing tick labels by 1
+        xmax = np.floor(np.log10(ax.get_xlim()[1]-1))
+        real_val = np.logspace(-1, xmax, xmax+2)
+        real_val[0] = 0
+        tick_pos = real_val+1
         # Replace tick labels
         plt.xticks(tick_pos, real_val)
+        # Reverse data
+        data[:,0] -= 1
     # Configuring log scale on y-axis
     if ylog:
         plt.yscale("log")
@@ -134,12 +132,15 @@ if __name__=="__main__":
         else:
             try:
                 filename=sys.argv[1]
-                xlabel = sys.argv[2]
+                if len(sys.argv)>2:
+                    xlabel = sys.argv[2]
+                else:
+                    xlabel = ""
             except:
                 raise ValueError("Not enough arguments. See Usage below.\n{}".format(USAGE_MESSAGE))
                 print USAGE_MESSAGE
             data = np.loadtxt(filename)
-            plot_distribution(data, xlabel=xlabel, normed=True, xlog=False, ylog=False, nbin=100)
+            plot_distribution(data, xlabel=xlabel, normed=False, xlog=True, ylog=False, nbin=100)
     else:
         pass
         # Make one plot with log scale on y-axis.
