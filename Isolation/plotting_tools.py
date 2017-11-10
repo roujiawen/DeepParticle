@@ -8,6 +8,9 @@ $ python plotting_tools.py path/to/input_filename.csv optional_plot_title
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+from preprocess import check_dir_exists
+
+INPUT_PATH = "data"
 
 # Directory for automatically saving plots
 OUTPUT_PATH = "data/plots"
@@ -16,15 +19,6 @@ OUTPUT_PATH = "data/plots"
 DIST_LABEL1 = "signal"
 DIST_LABEL2 = "background"
 
-def check_dir_exists(path):
-    """
-    Automatically create folders if it doesn't exist.
-    Prevent errors during output.
-    """
-    import os
-    path = os.path.join(os.path.dirname(__file__), path)
-    if not os.path.exists(path):
-        os.makedirs(path)
 
 def format_out_filename(xlabel, normed, xlog, ylog, nbin):
     """
@@ -116,6 +110,33 @@ def generate_all_plots(data, xlabel, nbin=100):
             normed=normed, xlog=xlog, ylog=ylog, nbin=nbin,
             save=True, noshow=True)
 
+def plot_roc(data):
+    fig, ax = plt.subplots()
+    for name, each_data in data.items():
+        plt.plot(each_data[:,0], each_data[:,1], label=name)
+
+    margin = 0.1
+    plt.xlim(-margin*0.2,0.2+margin*0.2)
+    plt.ylim(-margin,1 + margin)
+    plt.legend()
+    plt.grid("on")
+    for each in ["right", "left","top", "bottom"]:
+        ax.spines[each].set_visible(False)
+    plt.xlabel("Background Efficiency")
+    plt.ylabel("Signal Efficiency")
+    plt.show()
+
+def main():
+    ROC_INPUTS = {
+    "Absolute":"abs_iso_roc_data.csv",
+    "Relative":"rel_iso_roc_data.csv",
+    "DNN" : "dl_roc_data.csv"
+    }
+    data = {}
+    for name, filename in ROC_INPUTS.items():
+        data[name] = np.loadtxt(INPUT_PATH+"/"+filename, delimiter=",")
+    plot_roc(data)
+
 if __name__=="__main__":
     import sys
 
@@ -127,7 +148,10 @@ if __name__=="__main__":
                 xlabel = sys.argv[3]
             except:
                 raise ValueError("Not enough arguments. See Usage below.\n{}".format(USAGE_MESSAGE))
-            data = np.loadtxt(filename)
+            try:
+                data = np.loadtxt(filename)
+            except ValueError:
+                data = np.loadtxt(filename, delimiter=",")
             generate_all_plots(data, xlabel)
         else:
             try:
@@ -140,9 +164,9 @@ if __name__=="__main__":
                 raise ValueError("Not enough arguments. See Usage below.\n{}".format(USAGE_MESSAGE))
                 print USAGE_MESSAGE
             data = np.loadtxt(filename)
-            plot_distribution(data, xlabel=xlabel, normed=False, xlog=True, ylog=False, nbin=100)
+            plot_distribution(data, xlabel=xlabel, normed=True, xlog=False, ylog=True, nbin=100)
     else:
-        pass
+        main()
         # Make one plot with log scale on y-axis.
         #plot_distribution(data, xlabel="Absolute Isolation", normed=False, xlog=False, ylog=True, nbin=100)
 

@@ -11,8 +11,8 @@ def bias_variable(shape):
   initial = tf.constant(0.1, shape=shape)
   return tf.Variable(initial)
 
-train_p=np.load('H_zjets_feature_mu_20_res_20_large_test.npy').astype(np.float32) #positive samples (zjets)
-train_n=np.load('H_qcd_feature_mu_20_res_20_large_test.npy').astype(np.float32) #negative samples (qcd)
+train_p=np.load('data/H_zjets_feature_mu_20_res_20_large_test.npy').astype(np.float32) #positive samples (zjets)
+train_n=np.load('data/H_qcd_feature_mu_20_res_20_large_test.npy').astype(np.float32) #negative samples (qcd)
 
 train_data=np.vstack((train_p,train_n))
 train_out=np.array([1]*len(train_p)+[0]*len(train_n))
@@ -55,7 +55,7 @@ cross_entropy = tf.reduce_mean(
 train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 
 ntrain = len(train_data)
-batch_size = 105 
+batch_size = 105
 epoch_size = ntrain/batch_size
 cur_id = 0
 
@@ -79,9 +79,9 @@ with tf.Session() as sess:
     saver.save(sess,  'models/'+model_output_name+'/model_out')
     print "Model saved!"
 
-  prediction = tf.nn.sigmoid(y) 
+  prediction = tf.nn.sigmoid(y)
   pred = prediction.eval( feed_dict={x: valid_data, y_: valid_data_out} )
-  print pred  
+  print pred
 
   y = []
   signal_output = []
@@ -92,8 +92,8 @@ with tf.Session() as sess:
     writer = csv.writer(f)
     for i in range(len(valid_data)):
       x = valid_data_out[i] #valdiation label
-      if x == 1: #signal output 
-        signal_output.append( pred[i] ) 
+      if x == 1: #signal output
+        signal_output.append( pred[i] )
         y = pred[i]
         writer.writerow( y )
 
@@ -102,7 +102,7 @@ with tf.Session() as sess:
     for i in range(len(valid_data)):
       x = valid_data_out[i] #validation level
       if x == 0: #background output
-        background_output.append( pred[i] ) 
+        background_output.append( pred[i] )
         y = pred[i]
         writer.writerow( y )
 
@@ -115,19 +115,17 @@ with tf.Session() as sess:
 
   #signal count
   ns_sel = len(s_output[s]) # count only elements larger than threshold
-  ns_total = len(signal_output) 
-  
-  #background count 
+  ns_total = len(signal_output)
+
+  #background count
   nb_sel = len(b_output[b]) # count only elements larger than threshold
   nb_total = len(background_output)
 
   print "signal : " , ns_sel ,  "/" , ns_total
   print "background : ", nb_sel ,  "/" , nb_total
- 
+
   #efficiency
-  sig_eff = float(ns_sel)/float(ns_total) 
+  sig_eff = float(ns_sel)/float(ns_total)
   bkg_eff = float(nb_sel)/float(nb_total)
- 
+
   print "signal eff = ", sig_eff, " background eff = ", bkg_eff
-
-

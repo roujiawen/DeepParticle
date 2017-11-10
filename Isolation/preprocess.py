@@ -2,6 +2,16 @@ import numpy as np
 
 masscuts=[0,9999]#[120,220]#[120,220]#[150,190]#[130,200]#[0,1e5]  #mass cuts
 
+def check_dir_exists(path):
+    """
+    Automatically create folders if it doesn't exist.
+    Prevent errors during output.
+    """
+    import os
+    path = os.path.join(os.path.dirname(__file__), path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+
 def get_shape(data):
     nset = 0
     maxn = 0

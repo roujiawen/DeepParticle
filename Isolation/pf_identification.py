@@ -1,18 +1,10 @@
 import numpy as np
-from preprocess import read_txt
+from preprocess import read_txt, check_dir_exists
 OUTPUT_PATH = "data"
 OUTPUT_ABS_FILE = "abs_iso_with_labels.csv"
 OUTPUT_REL_FILE = "rel_iso_with_labels.csv"
 
-def check_dir_exists(path):
-    """
-    Automatically create folders if it doesn't exist.
-    Prevent errors during output.
-    """
-    import os
-    path = os.path.join(os.path.dirname(__file__), path)
-    if not os.path.exists(path):
-        os.makedirs(path)
+
 
 def calc_abs_iso(px, py):
     """
@@ -48,7 +40,7 @@ def concat(iso):
 
 def export_csv(data, filename):
     check_dir_exists(OUTPUT_PATH)
-    np.savetxt(OUTPUT_PATH+"/"+filename, data, delimiter=" ")
+    np.savetxt(OUTPUT_PATH+"/"+filename, data, delimiter=",", fmt=["%.10g","%d"])
     print ("Saved as {}!".format(OUTPUT_PATH+"/"+filename))
 
 def generate_pf_iden(zjets_file=None, qcd_file=None):
